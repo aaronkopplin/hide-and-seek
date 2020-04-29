@@ -1,6 +1,12 @@
 import pygame
 import GlobalVariables
 import NeuralNetwork
+import math
+
+
+def distance(x1, x2, y1, y2):
+    return math.sqrt(((x1 - x2) ** 2) + ((y1 - y2) ** 2))
+
 
 
 class Hider:
@@ -15,7 +21,10 @@ class Hider:
         self.surface.set_alpha(GlobalVariables.hider_alpha)
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.speed = GlobalVariables.hider_speed
+        self.acceleration = GlobalVariables.hider_acceleration
         self.network = network
+        self.time_alive = 1
+        self.distances_from_seeker = []
         self.alive = True
 
     def reproduce(self, b_genes: list, mutation_rate: int):
@@ -31,7 +40,8 @@ class Hider:
         return self.network.get_genes()
 
     def get_fitness(self):
-        return self.network.get_fitness()
+        print(self.get_average_distance_from_seeker())
+        return self.get_average_distance_from_seeker()
 
     def update_rect(self):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -40,15 +50,18 @@ class Hider:
         self.update_rect()
         return self.rect
 
+    def get_average_distance_from_seeker(self):
+        return sum(self.distances_from_seeker) / len(self.distances_from_seeker)
+
     def hide(self, seeker, background_rect):
-        x_value = self.x / GlobalVariables.screen_width
-        y_value = self.y / GlobalVariables.screen_height
-        seeker_x_value = seeker.x / GlobalVariables.screen_width
-        seeker_y_value = seeker.y / GlobalVariables.screen_height
-        d_to_top_wall = (self.y - background_rect.y) / GlobalVariables.screen_height
-        d_to_bottom_wall = (background_rect.height - self.y) / GlobalVariables.screen_height
-        d_to_left_wall = (self.x - background_rect.x) / GlobalVariables.screen_width
-        d_to_right_wall =(background_rect.width - self.x) / GlobalVariables.screen_width
+        x_value = self.x / (GlobalVariables.screen_width * 1.0)
+        y_value = self.y / (GlobalVariables.screen_height * 1.0)
+        seeker_x_value = seeker.x / (GlobalVariables.screen_width * 1.0)
+        seeker_y_value = seeker.y / (GlobalVariables.screen_height * 1.0)
+        d_to_top_wall = (self.y - background_rect.y) / (GlobalVariables.screen_height * 1.0)
+        d_to_bottom_wall = (background_rect.height - self.y) / (GlobalVariables.screen_height * 1.0)
+        d_to_left_wall = (self.x - background_rect.x) / (GlobalVariables.screen_width * 1.0)
+        d_to_right_wall = (background_rect.width - self.x) / (GlobalVariables.screen_width * 1.0)
         movement = self.network.fire([x_value,
                                       y_value,
                                       seeker_x_value,
@@ -58,28 +71,39 @@ class Hider:
                                       d_to_left_wall,
                                       d_to_right_wall])
 
+        # update fitness
+        self.time_alive += 1
+        self.distances_from_seeker.append(distance(x_value, seeker_x_value, y_value, seeker_y_value))
+
+        self.speed = movement[4]
+        self.acceleration = movement[5]
+
         # move left
-        self.x -= self.speed * movement[0]
+        self.x -= self.calculate_movement_distance(movement[0])
         if self.x < 0:
             self.x = 0
 
         # move right
-        self.x += self.speed * movement[1]
+        self.x += self.calculate_movement_distance(movement[1])
         if self.x + self.width > background_rect.width:
             self.x = background_rect.width - self.width
 
         # move up
-        self.y -= self.speed * movement[2]
+        self.y -= self.calculate_movement_distance(movement[2])
         if self.y < 0:
             self.y = 0
 
         # move down
-        self.y += self.speed * movement[3]
+        self.y += self.calculate_movement_distance(movement[3])
         if self.y + self.height > background_rect.height:
             self.y = background_rect.height - self.height
 
         # update the rect
         self.update_rect()
+
+    def calculate_movement_distance(self, input):
+        self.speed = self.speed * self.acceleration
+        return self.speed * input
 
     def is_alive(self):
         return self.alive

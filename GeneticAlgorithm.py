@@ -11,8 +11,8 @@ def reproduce(parent_a: Hider, parent_b: Hider, rate: int):
     return parent_a.reproduce(parent_b.get_genes(), rate)
 
 
-population_size = 150
-mutation_rate = 1
+population_size = 100
+mutation_rate = 2
 num_generations = 100
 
 # setup - create a population of n elements

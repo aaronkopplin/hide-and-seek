@@ -13,10 +13,11 @@ hider_width = square_length
 hider_height = square_length
 hider_inputs = 8
 hider_hidden_layer = 12
-hider_output = 4
+hider_output = 6
 hider_color = (0, 255, 0)
 hider_alpha = 50
 hider_speed = 5
+hider_acceleration = 1
 
 seeker_spawn_x = 150
 seeker_spawn_y = (screen_height / 2) - 10

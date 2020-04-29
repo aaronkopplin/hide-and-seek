@@ -24,7 +24,7 @@ def mutate(genes, num_genes):
 
 
 def new_gene():
-    return random.uniform(-1, 1)
+    return random.uniform(-1.2, 1.2)
 
 
 class NeuralNetwork:
@@ -39,19 +39,11 @@ class NeuralNetwork:
         self.output_nodes = []
         self.load_genes(self.random_genes())
 
-        # for calculating fitness
-        self.time_alive = 0
-
     # feeds input through each layer and returns list of output node activations
     def fire(self, input_values: list) -> list:
-        self.time_alive += 1
         return feed_forward(self.hidden_synapses,
                             feed_forward(self.input_synapses, input_values, self.hidden_layer_nodes),
                             self.output_nodes)
-
-    # for evaluating fitness
-    def get_fitness(self):
-        return self.time_alive
 
     # generate a list of random genes to load to the network
     def random_genes(self):
