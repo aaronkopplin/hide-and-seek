@@ -27,6 +27,8 @@ class Seeker:
 
         # return true to tell game that you have collided
         if hider_rect.colliderect(self.rect):
+            self.kill()
+            hider.kill()
             return True
         else:
             # aim seeker at hider's center
@@ -44,6 +46,9 @@ class Seeker:
 
     def kill(self):
         self.alive = False
+
+    def resuscitate(self):
+        self.alive = True
 
     def __str__(self):
         return "(" + str(self.x)[:5] + ", " + str(self.y)[:5] + \

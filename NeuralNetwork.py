@@ -92,7 +92,6 @@ class NeuralNetwork:
         mutate(new_genes, mutation_rate)
         self.load_genes(new_genes)
 
-
     def __str__(self):
         return "input synapses: " + str(self.input_synapses) \
                + "\nhidden layer nodes: " + str(self.hidden_layer_nodes) \
