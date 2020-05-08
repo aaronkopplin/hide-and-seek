@@ -22,7 +22,7 @@ class Hider:
         self.speed = GlobalVariables.hider_speed
         self.acceleration = GlobalVariables.hider_acceleration
         self.network = network
-        self.time_alive = 1
+        self.fitness = 1
         # self.distances_from_seeker = []
         self.alive = True
 
@@ -46,9 +46,7 @@ class Hider:
         return self.network.get_genes()
 
     def get_fitness(self):
-        # print(self.get_average_distance_from_seeker())
-        # return self.get_average_distance_from_seeker()
-        return self.time_alive
+        return self.fitness
 
     def update_rect(self):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -56,6 +54,9 @@ class Hider:
     def get_rect(self):
         self.update_rect()
         return self.rect
+
+    def update_fitness(self, seeker):
+        self.fitness += math.pow(distance(self.x, seeker.x, self.y, seeker.y), 2)
 
     def hide(self, seeker, background_rect):
         x_value = self.x / (GlobalVariables.screen_width * 1.0)
@@ -76,7 +77,7 @@ class Hider:
                                       d_to_right_wall])
 
         # update fitness
-        self.time_alive += 1
+        self.update_fitness(seeker)
         # self.distances_from_seeker.append(distance(self.x, seeker.x, self.y, seeker.y))
 
         self.speed = movement[4]

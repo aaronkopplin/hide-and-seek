@@ -1,9 +1,7 @@
 import statistics
-
 import pygame
 import GlobalVariables
 import time
-import numpy
 import random
 import Hider
 
@@ -70,13 +68,20 @@ class HideAndSeek:
         self.num_generations = num_generations
         self.current_generation = 0
 
+        self.scores = []
+
         # final
         self.run()
 
     def evolve(self):
+        # reset the seekers so they spawn at the default spawn point
         self.seekers = [GlobalVariables.new_seeker() for x in self.hiders]
+
         # calculate fitness of population
         fitness = [x.get_fitness() for x in self.hiders]
+
+        # append to scores for printing diagnostics
+        self.scores.append(statistics.median(fitness))
 
         # select parents
         self.hiders.sort(key=lambda x: x.get_fitness(), reverse=True)
@@ -93,7 +98,8 @@ class HideAndSeek:
         self.hiders = population
         self.current_generation += 1
         self.kill_count = 0
-        print("generation " + str(self.current_generation) + "\tmedian fitness: " + str(int(statistics.median(fitness))))
+        print("generation " + str(self.current_generation) + "\timprovement: " +
+              str(self.scores[-1] / self.scores[0] - 1)[:5] + "%")
 
     def tick(self):
         if self.kill_count == self.population_size:

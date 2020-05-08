@@ -2,7 +2,7 @@ import Hider
 import NeuralNetwork
 import Seeker
 
-frame_rate = 1/1000000.0
+frame_rate = 1/600.0
 screen_width = 200
 screen_height = 200
 
